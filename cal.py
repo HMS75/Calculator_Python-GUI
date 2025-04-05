@@ -1,97 +1,118 @@
-#Calculator
-
 import tkinter as tk
+import math
+
 root = tk.Tk()
-root.title("Calculator")
-root.geometry("300x400")
+root.title("Enhanced Calculator")
+root.geometry("320x450")
+root.configure(bg="#2e2e2e")  
+# Dark background
 
-entry = tk.Entry(root, width=15, font=("Arial", 20), justify="right")
-entry.grid(row=0, column=0, columnspan=4, ipadx=8, ipady=8)
+expression = ""
+memory = ""
 
-"""b7 = tk.Button(root, text="7")
-b7.grid(row=1, column=0, padx=10, pady=5)
-b8 = tk.Button(root, text="8")
-b8.grid(row=1, column=1, padx=10, pady=5)
-b9= tk.Button(root, text="9")
-b9.grid(row=1, column=2, padx=10, pady=5)
-b4 = tk.Button(root, text="4")
-b4.grid(row=2, column=0, padx=10, pady=5)
-b5 = tk.Button(root, text="5")
-b5.grid(row=2, column=1, padx=10, pady=5)
-b6 = tk.Button(root, text="6")
-b6.grid(row=2, column=2, padx=10, pady=5)
-b1 = tk.Button(root, text="1")
-b1.grid(row=3, column=0, padx=10, pady=5)
-b2 = tk.Button(root, text="2")
-b2.grid(row=3, column=1, padx=10, pady=5)
-b3 = tk.Button(root, text="3")
-b3.grid(row=3, column=2, padx=10, pady=5)
-b0 = tk.Button(root, text=0)
-b0.grid(row=4, column=1, padx=10, pady=5)
-ba = tk.Button(root, text="+")
-ba.grid(row=4, column=3, padx=10, pady=5)
-bs = tk.Button(root, text="-")
-bs.grid(row=3, column=3, padx=10, pady=5)
-bm = tk.Button(root, text="*")
-bm.grid(row=2, column=3, padx=10, pady=5)
-bd = tk.Button(root, text="/")
-bd.grid(row=1, column=3, padx=10, pady=5)
-be = tk.Button(root, text="=")
-be.grid(row=4, column=2, padx=10, pady=5)
-bc = tk.Button(root, text="C")
-bc.grid(row=4, column=0, padx=10, pady=5)"""
+entry = tk.Entry(root, width=20, font=("Arial", 22), justify="right", bd=5, bg="#1e1e1e", fg="white")
+entry.grid(row=0, column=0, columnspan=4, ipadx=8, ipady=12, pady=10)
 
-expression=""
+def update_display(value):
+    entry.delete(0, tk.END)
+    entry.insert(0, value)
 
 def num_handle(value):
     global expression
-    expression+=str(value)
+    expression += str(value)
     update_display(expression)
-    
+
 def op_handle(op_value):
     global expression
-    if expression != "" and expression[-1] not in "+-*/":
+    if expression and expression[-1] not in "+-*/^%":
         expression += op_value
     update_display(expression)
-    
+
+def cl_handle():
+    global expression
+    expression = ""
+    update_display("0")
+
+def sqrt_handle():
+    global expression
+    try:
+        result = str(math.sqrt(float(expression)))
+        expression = result
+        update_display(result)
+    except:
+        expression = ""
+        update_display("Error!")
+
+def pow_handle():
+    global expression
+    if expression and expression[-1].isdigit():
+        expression += "**"
+    update_display(expression)
+
+def mod_handle():
+    global expression
+    if expression and expression[-1].isdigit():
+        expression += "%"
+    update_display(expression)
+
 def eq_handle():
     global expression
     try:
-        result= str(eval(expression))
-        expression=result
-        update_display(expression)
+        result = str(eval(expression))
+        expression = result
+        update_display(result)
     except ZeroDivisionError:
-        expression=""
-        update_display("Error! denominator is 0")
+        expression = ""
+        update_display("Error! ÷ by 0")
     except:
-        expression=""
-        update_display("Error!")
-        
-def cl_handle():
-    global expression
-    expression=""
-    update_display("0")
-    
-def update_display(value):
-    entry.delete(0, tk.END)  # Clear previous display
-    entry.insert(0, value)
+        expression = ""
+        update_display("Invalid input")
 
+def mem_save():
+    global memory, expression
+    memory = expression
+    update_display("Saved")
+    
+def mem_recall():
+    global expression
+    expression += memory
+    update_display(expression)
+    
+#adding buttons
 buttons = [
-    ('7', 1, 0), ('8', 1, 1), ('9', 1, 2), ('/', 1, 3),
-    ('4', 2, 0), ('5', 2, 1), ('6', 2, 2), ('*', 2, 3),
-    ('1', 3, 0), ('2', 3, 1), ('3', 3, 2), ('-', 3, 3),
-    ('0', 4, 1), ('C', 4, 0), ('=', 4, 2), ('+', 4, 3)
+    ('C', 1, 0), ('√', 1, 1), ('^', 1, 2), ('%', 1, 3),
+    ('7', 2, 0), ('8', 2, 1), ('9', 2, 2), ('/', 2, 3),
+    ('4', 3, 0), ('5', 3, 1), ('6', 3, 2), ('*', 3, 3),
+    ('1', 4, 0), ('2', 4, 1), ('3', 4, 2), ('-', 4, 3),
+    ('0', 5, 0), ('M+', 5, 1), ('MR', 5, 2), ('+', 5, 3),
+    ('=', 6, 0, 4)
 ]
 
-for (text, row, col) in buttons:
-    if text.isdigit():  # If button is a number
+for btn in buttons:
+    text = btn[0]
+    row = btn[1]
+    col = btn[2]
+    colspan = btn[3] if len(btn) == 4 else 1
+
+    if text.isdigit():
         action = lambda t=text: num_handle(t)
-    elif text in "+-*/":  # If button is an operator
+    elif text in "+-*/":
         action = lambda t=text: op_handle(t)
-    elif text == "=":  # If button is "="
-        action = eq_handle
-    else:  # If button is "C" (Clear)
+    elif text == "C":
         action = cl_handle
-    tk.Button(root, text=text, font=("Arial", 20), padx=20, pady=20, command=action).grid(row=row, column=col, sticky="nsew")
+    elif text == "=":
+        action = eq_handle
+    elif text == "√":
+        action = sqrt_handle
+    elif text == "^":
+        action = pow_handle
+    elif text == "%":
+        action = mod_handle
+    elif text == "M+":
+        action = mem_save
+    elif text == "MR":
+        action = mem_recall
+
+    tk.Button(root, text=text, font=("Arial", 18), padx=10, pady=15, width=5, bg="#444", fg="white", command=action).grid(row=row, column=col, columnspan=colspan, sticky="nsew", padx=2, pady=2)
 
 root.mainloop()
