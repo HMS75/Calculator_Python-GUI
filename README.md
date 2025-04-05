@@ -14,7 +14,7 @@ A GUI-based calculator built using Python's Tkinter library with basic and advan
 
 ## How to Run
 1. Install Python 3.x
-2. Run `python calculator.py`
+2. Run `python cal.py`
 
 ## Screenshot
 ![image](https://github.com/user-attachments/assets/33fd308f-4fa3-4693-8098-469e73c66ae0)
